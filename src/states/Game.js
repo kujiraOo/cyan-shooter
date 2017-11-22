@@ -1,9 +1,11 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
 import Mushroom from '../sprites/Mushroom'
+import Player from '../sprites/Player'
 
 export default class extends Phaser.State {
   init () {}
+
   preload () {}
 
   create () {
@@ -23,7 +25,15 @@ export default class extends Phaser.State {
       asset: 'mushroom'
     })
 
+    this.player = new Player({
+      game: this.game,
+      x: 20,
+      y: 20,
+      asset: 'player'
+    })
+
     this.game.add.existing(this.mushroom)
+    this.game.add.existing(this.player)
   }
 
   render () {
