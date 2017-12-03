@@ -1,11 +1,16 @@
 import Phaser from 'phaser'
+import Bullet from './Bullet'
 
 export default class extends Phaser.Sprite {
   constructor ({game, x, y, asset}) {
     super(game, x, y, asset)
+
+    this._fireRate = 100
+    this._nextFire = 0
+
     this.anchor.setTo(0.5)
 
-    const debugOpacity = 1
+    const debugOpacity = 0
 
     this.speed = 200
 
@@ -16,7 +21,14 @@ export default class extends Phaser.Sprite {
       'right': Phaser.KeyCode.D
     })
 
-    this._pointerThreshold1 = 80
+    this._bullets = game.add.group()
+    this._bullets.enableBody = true
+    this._bullets.physicsBodyType = Phaser.Physics.ARCADE
+
+    this._bullets.setAll('checkWorldBounds', true)
+    this._bullets.setAll('outOfBoundsKill', true)
+
+    this._pointerThreshold1 = 50
     this._pointerThreshold2 = 100
 
     this._pointerBounds = game.add.graphics(0, 0)
@@ -37,10 +49,6 @@ export default class extends Phaser.Sprite {
     })
 
     game.input.addMoveCallback(() => {
-      console.log(game.input.activePointer.rawMovementX, game.input.activePointer.rawMovementY)
-      // console.log(Phaser.Math.angleBetween(
-      //   ))
-
       this._pointerGfx.x += game.input.activePointer.rawMovementX
       this._pointerGfx.y += game.input.activePointer.rawMovementY
 
@@ -48,11 +56,9 @@ export default class extends Phaser.Sprite {
         const pointerAngle = Phaser.Math.angleBetween(0, 0, this._pointerGfx.x, this._pointerGfx.y)
         this._pointerGfx.x = this._pointerThreshold2 * Math.cos(pointerAngle)
         this._pointerGfx.y = this._pointerThreshold2 * Math.sin(pointerAngle)
-        console.log(Phaser.Math.distance(0, 0, this._pointerGfx.x, this._pointerGfx.y))
       }
 
       if (Phaser.Math.distance(0, 0, this._pointerGfx.x, this._pointerGfx.y) > this._pointerThreshold1) {
-
         this.rotation = Phaser.Math.angleBetween(
           0,
           0,
@@ -110,9 +116,24 @@ export default class extends Phaser.Sprite {
     }
   }
 
+  fire () {
+    if (this.game.time.now > this._nextFire) {
+      this._nextFire = this.game.time.now + this._fireRate;
+
+      const bullet = new Bullet(this.game, this.x, this.y)
+      this._bullets.add(bullet)
+      console.log(this.rotation, Math.cos(this.rotation) * 1000, Math.sin(this.rotation) * 1000)
+      this.game.physics.arcade.moveToXY(bullet, this.x + Math.cos(this.rotation) * 1000, this.y + Math.sin(this.rotation) * 1000, 300)
+    }
+  }
+
   update () {
     // this.rotation = this.game.physics.arcade.angleToPointer(this)
     this.handleMovementInput()
+
+    if (this.game.input.activePointer.isDown) {
+      this.fire()
+    }
 
     // console.log(this.game.input.pointer)
     //
