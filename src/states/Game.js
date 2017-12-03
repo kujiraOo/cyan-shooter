@@ -31,14 +31,13 @@ export default class extends Phaser.State {
       y: 20,
       asset: 'player'
     })
-
-    this.game.add.existing(this.mushroom)
+    // this.game.add.existing(this.mushroom)
     this.game.add.existing(this.player)
   }
 
   render () {
     if (__DEV__) {
-      this.game.debug.spriteInfo(this.mushroom, 32, 32)
+      // this.game.debug.spriteInfo(this.mushroom, 32, 32)
     }
   }
 }
