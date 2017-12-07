@@ -2,6 +2,7 @@
 import Phaser from 'phaser'
 import Mushroom from '../sprites/Mushroom'
 import Player from '../sprites/Player'
+import io from 'socket.io-client'
 
 export default class extends Phaser.State {
   init () {}
@@ -33,6 +34,12 @@ export default class extends Phaser.State {
     })
     // this.game.add.existing(this.mushroom)
     this.game.add.existing(this.player)
+
+    const socket = io('http://localhost:3000')
+
+    socket.on('connect', () => {
+      console.log('socket ok')
+    })
   }
 
   render () {

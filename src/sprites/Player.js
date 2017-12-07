@@ -122,7 +122,7 @@ export default class extends Phaser.Sprite {
 
       const bullet = new Bullet(this.game, this.x, this.y)
       this._bullets.add(bullet)
-      console.log(this.rotation, Math.cos(this.rotation) * 1000, Math.sin(this.rotation) * 1000)
+      // console.log(this.rotation, Math.cos(this.rotation) * 1000, Math.sin(this.rotation) * 1000)
       this.game.physics.arcade.moveToXY(bullet, this.x + Math.cos(this.rotation) * 1000, this.y + Math.sin(this.rotation) * 1000, 300)
     }
   }
