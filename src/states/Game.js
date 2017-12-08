@@ -10,6 +10,8 @@ export default class extends Phaser.State {
   preload () {}
 
   create () {
+    this.game.physics.startSystem(Phaser.Physics.P2JS)
+
     const bannerText = 'Phaser + ES6 + Webpack'
     let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText)
     banner.font = 'Bangers'
