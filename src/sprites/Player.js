@@ -51,6 +51,21 @@ export default class extends Phaser.Sprite {
     game.input.addMoveCallback(() => {
       this.handleAimingInput()
     }, this)
+
+    this.initInput()
+  }
+
+  initInput () {
+    this.keys.up.onDown.add(() => {
+      console.log('UP')
+    })
+
+    this.keys.up.onUp.add(() => {
+      console.log('UP released')
+    })
+
+    // const key1 = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE)
+    // key1.onDown.add(addPhaserDude, this)
   }
 
   handleAimingInput () {
@@ -130,7 +145,7 @@ export default class extends Phaser.Sprite {
 
   update () {
     // this.rotation = this.game.physics.arcade.angleToPointer(this)
-    this.handleMovementInput()
+    // this.handleMovementInput()
 
     if (this.game.input.activePointer.isDown) {
       this.fire()

@@ -28,19 +28,25 @@ export default class extends Phaser.State {
       asset: 'mushroom'
     })
 
-    this.player = new Player({
-      game: this.game,
-      x: 20,
-      y: 20,
-      asset: 'player'
-    })
     // this.game.add.existing(this.mushroom)
-    this.game.add.existing(this.player)
 
     const socket = io('http://localhost:3000')
 
     socket.on('connect', () => {
       console.log('socket ok')
+
+      socket.on('playerInitialized', (player) => {
+        const {x, y} = player
+        console.log(player)
+
+        this.player = new Player({
+          game: this.game,
+          x, y,
+          asset: 'player'
+        })
+
+        this.game.add.existing(this.player)
+      })
     })
   }
 
