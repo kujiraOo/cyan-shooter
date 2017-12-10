@@ -42,7 +42,8 @@ export default class extends Phaser.State {
         this.player = new Player({
           game: this.game,
           x, y,
-          asset: 'player'
+          asset: 'player',
+          socket: socket
         })
 
         this.game.add.existing(this.player)

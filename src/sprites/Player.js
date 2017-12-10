@@ -2,9 +2,10 @@ import Phaser from 'phaser'
 import Bullet from './Bullet'
 
 export default class extends Phaser.Sprite {
-  constructor ({game, x, y, asset}) {
+  constructor ({game, x, y, asset, socket}) {
     super(game, x, y, asset)
 
+    this._socket = socket
     this._fireRate = 100
     this._nextFire = 0
 
@@ -56,12 +57,46 @@ export default class extends Phaser.Sprite {
   }
 
   initInput () {
-    this.keys.up.onDown.add(() => {
-      console.log('UP')
+    const {_socket, keys} = this
+
+    keys.up.onDown.add(() => {
+      console.log('UP pressed')
+      _socket.emit('playerInput', {up: true})
     })
 
-    this.keys.up.onUp.add(() => {
+    keys.up.onUp.add(() => {
       console.log('UP released')
+      _socket.emit('playerInput', {up: false})
+    })
+
+    keys.down.onDown.add(() => {
+      console.log('down pressed')
+      _socket.emit('playerInput', {down: true})
+    })
+
+    keys.down.onUp.add(() => {
+      console.log('down released')
+      _socket.emit('playerInput', {down: false})
+    })
+
+    keys.left.onDown.add(() => {
+      console.log('left pressed')
+      _socket.emit('playerInput', {left: true})
+    })
+
+    keys.left.onUp.add(() => {
+      console.log('left released')
+      _socket.emit('playerInput', {left: false})
+    })
+
+    keys.right.onDown.add(() => {
+      console.log('right pressed')
+      _socket.emit('playerInput', {right: true})
+    })
+
+    keys.right.onUp.add(() => {
+      console.log('right released')
+      _socket.emit('playerInput', {right: false})
     })
 
     // const key1 = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE)
