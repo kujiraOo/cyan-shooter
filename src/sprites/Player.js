@@ -11,7 +11,7 @@ export default class extends Phaser.Sprite {
 
     this.anchor.setTo(0.5)
 
-    const debugOpacity = 0
+    const debugOpacity = 1
 
     this.speed = 200
 
@@ -55,10 +55,15 @@ export default class extends Phaser.Sprite {
 
     this.initInput()
 
-    socket.on('playerMove', ({x, y}) => {
-      this.x = x
-      this.y = y
+    socket.on('playerStateUpdate', (data) => {
+      this.handleStateUpdate(data)
     })
+  }
+
+  handleStateUpdate ({x, y, rotation}) {
+    this.x = x
+    this.y = y
+    this.rotation = rotation
   }
 
   initInput () {
@@ -109,7 +114,7 @@ export default class extends Phaser.Sprite {
   }
 
   handleAimingInput () {
-    const {game} = this
+    const {game, _socket} = this
 
     this._pointerGfx.x += game.input.activePointer.rawMovementX
     this._pointerGfx.y += game.input.activePointer.rawMovementY
@@ -121,11 +126,15 @@ export default class extends Phaser.Sprite {
     }
 
     if (Phaser.Math.distance(0, 0, this._pointerGfx.x, this._pointerGfx.y) > this._pointerThreshold1) {
-      this.rotation = Phaser.Math.angleBetween(
-        0,
-        0,
-        this._pointerGfx.x,
-        this._pointerGfx.y)
+      _socket.emit(
+        'playerInput',
+        {
+          rotation: Phaser.Math.angleBetween(
+            0,
+            0,
+            this._pointerGfx.x,
+            this._pointerGfx.y)
+        })
     }
   }
 

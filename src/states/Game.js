@@ -48,6 +48,10 @@ export default class extends Phaser.State {
       this.socket.on('enemyInitialized', (enemy) => {
         this.handleEnemyInitialization(enemy)
       })
+
+      this.socket.on('playerRemoved', id => {
+        this.handlePlayerRemove(id)
+      })
     })
   }
 
@@ -86,6 +90,13 @@ export default class extends Phaser.State {
     })
 
     this.game.add.existing(_enemies[id])
+  }
+
+  handlePlayerRemove (enemyToRemoveId) {
+    const {_enemies} = this
+    const enemyToRemove = _enemies[enemyToRemoveId]
+    delete _enemies[enemyToRemoveId]
+    enemyToRemove.destroy()
   }
 
   render () {
