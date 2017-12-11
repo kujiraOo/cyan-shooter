@@ -67,7 +67,17 @@ export default class extends Phaser.Sprite {
   }
 
   initInput () {
-    const {_socket, keys} = this
+    const {_socket, keys, game} = this
+
+    game.input.activePointer.leftButton.onDown.add(() => {
+      console.log('left button pressed')
+      _socket.emit('playerInput', {leftButton: true})
+    })
+
+    game.input.activePointer.leftButton.onUp.add(() => {
+      console.log('left button released')
+      _socket.emit('playerInput', {leftButton: false})
+    })
 
     keys.up.onDown.add(() => {
       console.log('UP pressed')
@@ -108,9 +118,6 @@ export default class extends Phaser.Sprite {
       console.log('right released')
       _socket.emit('playerInput', {right: false})
     })
-
-    // const key1 = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE)
-    // key1.onDown.add(addPhaserDude, this)
   }
 
   handleAimingInput () {
