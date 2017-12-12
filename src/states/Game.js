@@ -1,9 +1,9 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
-import Mushroom from '../sprites/Mushroom'
 import Player from '../sprites/Player'
 import io from 'socket.io-client'
 import Enemy from '../sprites/Enemy'
+import Bullet from '../sprites/Bullet'
 
 export default class extends Phaser.State {
   init () {}
@@ -13,26 +13,14 @@ export default class extends Phaser.State {
   create () {
     // this.game.physics.startSystem(Phaser.Physics.P2JS)
 
-    const bannerText = 'Phaser + ES6 + Webpack'
-    let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText)
-    banner.font = 'Bangers'
-    banner.padding.set(10, 16)
-    banner.fontSize = 40
-    banner.fill = '#77BFA3'
-    banner.smoothed = false
-    banner.anchor.setTo(0.5)
-
     this.game.stage.disableVisibilityChange = true
 
-    this._enemies = {}
-    this._inGame = false
-
-    this.mushroom = new Mushroom({
-      game: this.game,
-      x: this.world.centerX,
-      y: this.world.centerY,
-      asset: 'mushroom'
-    })
+    this.enemies = {}
+    this.inGame = false
+    this.playerBullets = {}
+    this.enemyBullets = {}
+    this.playerBulletGroup = this.game.add.group()
+    this.enemyBulletGroup = this.game.add.group()
 
     // this.game.add.existing(this.mushroom)
 
@@ -52,13 +40,37 @@ export default class extends Phaser.State {
       this.socket.on('playerRemoved', id => {
         this.handlePlayerRemove(id)
       })
+
+      this.socket.on('playerBulletInitialized', data => {
+        this.handlePlayerBulletInitialization(data)
+      })
+
+      this.socket.on('enemyBulletInitialized', data => {
+        this.handleEnemyBulletInitialization(data)
+      })
+
+      this.socket.on('playerBulletMove', data => {
+        this.handlePlayerBulletMove(data)
+      })
+
+      this.socket.on('enemyBulletMove', data => {
+        this.handleEnemyBulletMove(data)
+      })
+
+      this.socket.on('playerBulletRemoved', bulletId => {
+        this.handlePlayerBulletRemove(bulletId)
+      })
+
+      this.socket.on('enemyBulletRemoved', bulletId => {
+        this.handleEnemyBulletRemove(bulletId)
+      })
     })
   }
 
   handlePlayerInitialization (player) {
     const {socket} = this
 
-    if (!this._inGame) {
+    if (!this.inGame) {
       const {x, y} = player
       console.log(player)
 
@@ -72,16 +84,16 @@ export default class extends Phaser.State {
 
       this.game.add.existing(this.player)
 
-      this._inGame = true
+      this.inGame = true
     }
   }
 
   handleEnemyInitialization (enemy) {
-    const {socket, _enemies} = this
+    const {socket, enemies} = this
     const {x, y, id} = enemy
     console.log('New enemy: ', enemy)
 
-    _enemies[id] = new Enemy({
+    enemies[id] = new Enemy({
       game: this.game,
       x,
       y,
@@ -89,14 +101,62 @@ export default class extends Phaser.State {
       socket: socket
     })
 
-    this.game.add.existing(_enemies[id])
+    this.game.add.existing(enemies[id])
   }
 
   handlePlayerRemove (enemyToRemoveId) {
-    const {_enemies} = this
-    const enemyToRemove = _enemies[enemyToRemoveId]
-    delete _enemies[enemyToRemoveId]
+    const {enemies} = this
+    const enemyToRemove = enemies[enemyToRemoveId]
+    delete enemies[enemyToRemoveId]
     enemyToRemove.destroy()
+  }
+
+  handlePlayerBulletInitialization ({id, x, y, playerId}) {
+    const {playerBullets, playerBulletGroup} = this
+    const bullet = new Bullet({game: this.game, x, y, id, playerId, group: playerBulletGroup, color: 0x00FFFF})
+    playerBullets[id] = bullet
+    playerBulletGroup.add(bullet)
+  }
+
+  handleEnemyBulletInitialization ({id, x, y, playerId}) {
+    const {enemyBullets, enemyBulletGroup} = this
+    const bullet = new Bullet({game: this.game, x, y, id, playerId, group: enemyBulletGroup, color: 0xFF0000})
+    enemyBullets[id] = bullet
+    enemyBulletGroup.add(bullet)
+  }
+
+  handlePlayerBulletMove ({id, x, y}) {
+    const {playerBullets} = this
+
+    const bullet = playerBullets[id]
+
+    bullet.x = x
+    bullet.y = y
+  }
+
+  handleEnemyBulletMove ({id, x, y}) {
+    const {enemyBullets} = this
+
+    const bullet = enemyBullets[id]
+
+    bullet.x = x
+    bullet.y = y
+  }
+
+  handlePlayerBulletRemove (bulletId) {
+    const {playerBullets, playerBulletGroup} = this
+    const bullet = playerBullets[bulletId]
+
+    playerBulletGroup.remove(bullet)
+    delete playerBullets[bulletId]
+  }
+
+  handleEnemyBulletRemove (bulletId) {
+    const {enemyBullets, enemyBulletGroup} = this
+    const bullet = enemyBullets[bulletId]
+
+    enemyBulletGroup.remove(bullet)
+    delete enemyBullets[bulletId]
   }
 
   render () {

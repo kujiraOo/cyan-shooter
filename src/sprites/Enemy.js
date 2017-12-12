@@ -9,9 +9,10 @@ export default class extends Phaser.Sprite {
 
     this.anchor.setTo(0.5)
 
-    socket.on('enemyMove', ({x, y}) => {
+    socket.on('enemyStateUpdate', ({x, y, rotation}) => {
       this.x = x
       this.y = y
+      this.rotation = rotation
     })
   }
 

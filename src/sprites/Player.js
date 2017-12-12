@@ -1,19 +1,14 @@
 import Phaser from 'phaser'
-import Bullet from './Bullet'
 
 export default class extends Phaser.Sprite {
   constructor ({game, x, y, asset, socket}) {
     super(game, x, y, asset)
 
     this._socket = socket
-    this._fireRate = 100
-    this._nextFire = 0
 
     this.anchor.setTo(0.5)
 
     const debugOpacity = 1
-
-    this.speed = 200
 
     this.keys = this.game.input.keyboard.addKeys({
       'up': Phaser.KeyCode.W,
@@ -21,13 +16,6 @@ export default class extends Phaser.Sprite {
       'left': Phaser.KeyCode.A,
       'right': Phaser.KeyCode.D
     })
-
-    this._bullets = game.add.group()
-    this._bullets.enableBody = true
-    this._bullets.physicsBodyType = Phaser.Physics.ARCADE
-
-    this._bullets.setAll('checkWorldBounds', true)
-    this._bullets.setAll('outOfBoundsKill', true)
 
     this._pointerThreshold1 = 50
     this._pointerThreshold2 = 100
@@ -145,30 +133,6 @@ export default class extends Phaser.Sprite {
     }
   }
 
-  fire () {
-    if (this.game.time.now > this._nextFire) {
-      this._nextFire = this.game.time.now + this._fireRate
-
-      const bullet = new Bullet(this.game, this.x, this.y)
-      this._bullets.add(bullet)
-      // console.log(this.rotation, Math.cos(this.rotation) * 1000, Math.sin(this.rotation) * 1000)
-      // this.game.physics.arcade.moveToXY(bullet, this.x + Math.cos(this.body.rotation) * 1000, this.y + Math.sin(this.body.rotation) * 1000, 300)
-    }
-  }
-
   update () {
-    // this.rotation = this.game.physics.arcade.angleToPointer(this)
-    // this.handleMovementInput()
-
-    if (this.game.input.activePointer.isDown) {
-      this.fire()
-    }
-
-    // console.log(this.game.input.pointer)
-    //
-    // if (this.game.input.activePointer.isDown) {
-    //   console.log('ok')
-    //   this.game.input.mouse.requestPointerLock()
-    // }
   }
 }
