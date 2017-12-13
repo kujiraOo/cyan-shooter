@@ -7,11 +7,8 @@
     "scripts": {
         "dev": "webpack",
         "deploy": "webpack --config webpack.production.config.js",
-        "cordova": "webpack --config webpack.cordova.config.js",
         "test": "eslint ./src/**/**.js",
-        "start": "webpack-dev-server --hot",
-        "start-production": "webpack-dev-server --hot --port=$PORT",
-        "pvp": "echo"
+        "start": "webpack-dev-server --hot"
     },
     "license": "MIT",
     "dependencies": {
