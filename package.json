@@ -10,7 +10,8 @@
         "cordova": "webpack --config webpack.cordova.config.js",
         "test": "eslint ./src/**/**.js",
         "start": "webpack-dev-server --hot",
-        "start-production": "webpack-dev-server --hot --port $PORT"
+        "start-production": "webpack-dev-server --hot --port=$PORT",
+        "pvp": "echo"
     },
     "license": "MIT",
     "dependencies": {
