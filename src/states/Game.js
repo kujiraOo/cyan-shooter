@@ -93,15 +93,17 @@ export default class extends Phaser.State {
     const {x, y, id} = enemy
     console.log('New enemy: ', enemy)
 
-    enemies[id] = new Enemy({
+    const enemySprite = new Enemy({
       game: this.game,
       x,
       y,
       asset: 'enemy',
-      socket: socket
+      socket: socket,
+      id
     })
+    enemies[id] = enemySprite
 
-    this.game.add.existing(enemies[id])
+    this.game.add.existing(enemySprite)
   }
 
   handlePlayerRemove (enemyToRemoveId) {

@@ -8,7 +8,7 @@ export default class extends Phaser.Sprite {
 
     this.anchor.setTo(0.5)
 
-    const debugOpacity = 1
+    const debugOpacity = 0
 
     this.keys = this.game.input.keyboard.addKeys({
       'up': Phaser.KeyCode.W,
