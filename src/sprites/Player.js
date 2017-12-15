@@ -1,12 +1,20 @@
 import Phaser from 'phaser'
+import HpBar from './HpBar'
 
 export default class extends Phaser.Sprite {
-  constructor ({game, x, y, asset, socket}) {
-    super(game, x, y, asset)
+  constructor ({game, x, y, asset, socket, hp}) {
+    super(game, x, y)
 
     this._socket = socket
 
     this.anchor.setTo(0.5)
+
+    this.hp = hp
+    this.hpBar = new HpBar({game, hp, x: -20, y: -28, color: 0x00FF00})
+    this.gfx = new Phaser.Sprite(game, 0, 0, asset)
+    this.gfx.anchor.setTo(0.5)
+    this.addChild(this.gfx)
+    this.addChild(this.hpBar)
 
     const debugOpacity = 0
 
@@ -51,7 +59,7 @@ export default class extends Phaser.Sprite {
   handleStateUpdate ({x, y, rotation}) {
     this.x = x
     this.y = y
-    this.rotation = rotation
+    this.gfx.rotation = rotation
   }
 
   initInput () {

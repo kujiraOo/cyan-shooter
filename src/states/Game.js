@@ -64,6 +64,33 @@ export default class extends Phaser.State {
       this.socket.on('enemyBulletRemoved', bulletId => {
         this.handleEnemyBulletRemove(bulletId)
       })
+
+      this.socket.on('playerKilled', () => {
+        this.player.visible = false
+      })
+
+      this.socket.on('enemyKilled', ({id}) => {
+        const enemy = this.enemies[id]
+        enemy.visible = false
+      })
+
+      this.socket.on('playerRespawned', ({hp}) => {
+        this.player.visible = true
+        this.player.hpBar.setHp(hp)
+      })
+
+      this.socket.on('enemyRespawned', ({id, hp}) => {
+        this.enemies[id].visible = true
+        this.enemies[id].hpBar.setHp(hp)
+      })
+
+      this.socket.on('playerHit', ({hp}) => {
+        this.player.hpBar.setHp(hp)
+      })
+
+      this.socket.on('enemyHit', ({id, hp}) => {
+        this.enemies[id].hpBar.setHp(hp)
+      })
     })
   }
 
@@ -71,7 +98,7 @@ export default class extends Phaser.State {
     const {socket} = this
 
     if (!this.inGame) {
-      const {x, y} = player
+      const {x, y, hp} = player
       console.log(player)
 
       this.player = new Player({
@@ -79,7 +106,8 @@ export default class extends Phaser.State {
         x,
         y,
         asset: 'player',
-        socket: socket
+        socket: socket,
+        hp
       })
 
       this.game.add.existing(this.player)
@@ -90,7 +118,7 @@ export default class extends Phaser.State {
 
   handleEnemyInitialization (enemy) {
     const {socket, enemies} = this
-    const {x, y, id} = enemy
+    const {x, y, id, hp} = enemy
     console.log('New enemy: ', enemy)
 
     const enemySprite = new Enemy({
@@ -99,7 +127,8 @@ export default class extends Phaser.State {
       y,
       asset: 'enemy',
       socket: socket,
-      id
+      id,
+      hp
     })
     enemies[id] = enemySprite
 
