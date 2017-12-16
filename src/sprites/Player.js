@@ -9,6 +9,10 @@ export default class extends Phaser.Sprite {
 
     this.anchor.setTo(0.5)
 
+    this.score = {
+      kills: 0,
+      deaths: 0
+    }
     this.hp = hp
     this.hpBar = new HpBar({game, hp, x: -20, y: -28, color: 0x00FF00})
     this.gfx = new Phaser.Sprite(game, 0, 0, asset)
@@ -53,6 +57,13 @@ export default class extends Phaser.Sprite {
 
     socket.on('playerStateUpdate', (data) => {
       this.handleStateUpdate(data)
+    })
+
+    socket.on('playerScored', ({score}) => {
+      this.score.deaths = score.deaths
+      this.score.kills = score.kills
+
+      console.log(this.score)
     })
   }
 
@@ -142,5 +153,9 @@ export default class extends Phaser.Sprite {
   }
 
   update () {
+  }
+
+  render() {
+    this.game.debug.text('This is debug text', 100, 380)
   }
 }

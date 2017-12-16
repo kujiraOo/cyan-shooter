@@ -65,8 +65,12 @@ export default class extends Phaser.State {
         this.handleEnemyBulletRemove(bulletId)
       })
 
-      this.socket.on('playerKilled', () => {
+      this.socket.on('playerKilled', ({score}) => {
         this.player.visible = false
+        this.player.score.deaths = score.deaths
+        this.player.score.kills = score.kills
+
+        console.log(this.player.score)
       })
 
       this.socket.on('enemyKilled', ({id}) => {
@@ -193,6 +197,10 @@ export default class extends Phaser.State {
   render () {
     if (__DEV__) {
       // this.game.debug.spriteInfo(this.mushroom, 32, 32)
+    }
+
+    if (this.player) {
+      this.game.debug.text(`k: ${this.player.score.kills} d: ${this.player.score.deaths}`, 20, 20)
     }
   }
 }
