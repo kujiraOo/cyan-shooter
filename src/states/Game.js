@@ -24,7 +24,7 @@ export default class extends Phaser.State {
 
     // this.game.add.existing(this.mushroom)
 
-    this.socket = io('http://localhost:3000')
+    this.socket = io()
 
     this.socket.on('connect', () => {
       console.log('socket ok')

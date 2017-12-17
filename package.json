@@ -5,7 +5,7 @@
     "author": "leandro cabrera <leandcabrera@gmail.com>",
     "main": "index.js",
     "scripts": {
-        "dev": "webpack",
+        "build": "webpack",
         "deploy": "webpack --config webpack.production.config.js",
         "test": "eslint ./src/**/**.js",
         "start": "webpack-dev-server --hot"
