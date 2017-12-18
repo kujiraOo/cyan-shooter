@@ -75,7 +75,9 @@ export default class extends Phaser.State {
 
       this.socket.on('enemyKilled', ({id}) => {
         const enemy = this.enemies[id]
-        enemy.visible = false
+        if (enemy) {
+          enemy.visible = false
+        }
       })
 
       this.socket.on('playerRespawned', ({hp}) => {
@@ -84,8 +86,12 @@ export default class extends Phaser.State {
       })
 
       this.socket.on('enemyRespawned', ({id, hp}) => {
-        this.enemies[id].visible = true
-        this.enemies[id].hpBar.setHp(hp)
+        const enemy = this.enemies[id]
+
+        if (enemy) {
+          enemy.visible = true
+          enemy.hpBar.setHp(hp)
+        }
       })
 
       this.socket.on('playerHit', ({hp}) => {
@@ -93,7 +99,11 @@ export default class extends Phaser.State {
       })
 
       this.socket.on('enemyHit', ({id, hp}) => {
-        this.enemies[id].hpBar.setHp(hp)
+        const enemy = this.enemies[id]
+
+        if (enemy) {
+          enemy.hpBar.setHp(hp)
+        }
       })
     })
   }
@@ -173,9 +183,10 @@ export default class extends Phaser.State {
     const {enemyBullets} = this
 
     const bullet = enemyBullets[id]
-
-    bullet.x = x
-    bullet.y = y
+    if (bullet) {
+      bullet.x = x
+      bullet.y = y
+    }
   }
 
   handlePlayerBulletRemove (bulletId) {
