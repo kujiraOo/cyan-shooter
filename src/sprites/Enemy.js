@@ -3,9 +3,10 @@ import Bullet from './Bullet'
 import HpBar from './HpBar'
 
 export default class extends Phaser.Sprite {
-  constructor ({game, x, y, hp, asset, socket, id}) {
+  constructor ({game, x, y, hp, asset, socket, id, teamId}) {
     super(game, x, y)
     this.id = id
+    this.teamId = teamId
     this.socket = socket
     this.anchor.setTo(0.5)
 

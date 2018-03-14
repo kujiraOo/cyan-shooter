@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import HpBar from './HpBar'
 
 export default class extends Phaser.Sprite {
-  constructor ({game, x, y, asset, socket, hp}) {
+  constructor ({game, x, y, asset, socket, hp, teamId}) {
     super(game, x, y)
 
     this._socket = socket
@@ -14,6 +14,7 @@ export default class extends Phaser.Sprite {
       deaths: 0
     }
     this.hp = hp
+    this.teamId = teamId
     this.hpBar = new HpBar({game, hp, x: -20, y: -28, color: 0x00FF00})
     this.gfx = new Phaser.Sprite(game, 0, 0, asset)
     this.gfx.anchor.setTo(0.5)

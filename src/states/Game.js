@@ -37,6 +37,10 @@ export default class extends Phaser.State {
         this.handleEnemyInitialization(enemy)
       })
 
+      this.socket.on('allyInitialized', (ally) => {
+        this.handleAllyInitialization(ally)
+      })
+
       this.socket.on('playerRemoved', id => {
         this.handlePlayerRemove(id)
       })
@@ -112,7 +116,7 @@ export default class extends Phaser.State {
     const {socket} = this
 
     if (!this.inGame) {
-      const {x, y, hp} = player
+      const {x, y, hp, teamId} = player
       console.log(player)
 
       this.player = new Player({
@@ -121,7 +125,8 @@ export default class extends Phaser.State {
         y,
         asset: 'player',
         socket: socket,
-        hp
+        hp,
+        teamId
       })
 
       this.game.add.existing(this.player)
@@ -131,18 +136,27 @@ export default class extends Phaser.State {
   }
 
   handleEnemyInitialization (enemy) {
+    this.initializeOtherPlayer(enemy, 'enemy')
+  }
+
+  handleAllyInitialization (ally) {
+    this.initializeOtherPlayer(ally, 'ally')
+  }
+
+  initializeOtherPlayer(otherPlayer, asset) {
     const {socket, enemies} = this
-    const {x, y, id, hp} = enemy
-    console.log('New enemy: ', enemy)
+    const {x, y, id, hp, teamId} = otherPlayer
+    console.log('New enemy: ', otherPlayer)
 
     const enemySprite = new Enemy({
       game: this.game,
       x,
       y,
-      asset: 'enemy',
+      asset,
       socket: socket,
       id,
-      hp
+      hp,
+      teamId
     })
     enemies[id] = enemySprite
 
