@@ -6,9 +6,9 @@ import Enemy from '../sprites/Enemy'
 import Bullet from '../sprites/Bullet'
 
 export default class extends Phaser.State {
-  init () {}
+  init () { }
 
-  preload () {}
+  preload () { }
 
   create () {
     // this.game.physics.startSystem(Phaser.Physics.P2JS)
@@ -21,6 +21,8 @@ export default class extends Phaser.State {
     this.enemyBullets = {}
     this.playerBulletGroup = this.game.add.group()
     this.enemyBulletGroup = this.game.add.group()
+    this.gameStateMessage = 'unknown'
+    this.teamScoresMessage = 'unknown'
 
     // this.game.add.existing(this.mushroom)
 
@@ -28,6 +30,10 @@ export default class extends Phaser.State {
 
     this.socket.on('connect', () => {
       console.log('socket ok')
+
+      this.enemies = {}
+      this.playerBullets = {}
+      this.enemyBullets = {}
 
       this.socket.on('playerInitialized', (player) => {
         this.handlePlayerInitialization(player)
@@ -69,7 +75,7 @@ export default class extends Phaser.State {
         this.handleEnemyBulletRemove(bulletId)
       })
 
-      this.socket.on('playerKilled', ({score}) => {
+      this.socket.on('playerKilled', ({ score }) => {
         this.player.visible = false
         this.player.score.deaths = score.deaths
         this.player.score.kills = score.kills
@@ -77,19 +83,19 @@ export default class extends Phaser.State {
         console.log(this.player.score)
       })
 
-      this.socket.on('enemyKilled', ({id}) => {
+      this.socket.on('enemyKilled', ({ id }) => {
         const enemy = this.enemies[id]
         if (enemy) {
           enemy.visible = false
         }
       })
 
-      this.socket.on('playerRespawned', ({hp}) => {
+      this.socket.on('playerRespawned', ({ hp }) => {
         this.player.visible = true
         this.player.hpBar.setHp(hp)
       })
 
-      this.socket.on('enemyRespawned', ({id, hp}) => {
+      this.socket.on('enemyRespawned', ({ id, hp }) => {
         const enemy = this.enemies[id]
 
         if (enemy) {
@@ -98,25 +104,33 @@ export default class extends Phaser.State {
         }
       })
 
-      this.socket.on('playerHit', ({hp}) => {
+      this.socket.on('playerHit', ({ hp }) => {
         this.player.hpBar.setHp(hp)
       })
 
-      this.socket.on('enemyHit', ({id, hp}) => {
+      this.socket.on('enemyHit', ({ id, hp }) => {
         const enemy = this.enemies[id]
 
         if (enemy) {
           enemy.hpBar.setHp(hp)
         }
       })
+
+      this.socket.on('teamScoresUpdated', (teamScoresMessage) => {
+        this.teamScoresMessage = teamScoresMessage
+      })
+
+      this.socket.on('gameStateChanged', (gameState) => {
+        this.gameStateMessage = gameState
+      })
     })
   }
 
   handlePlayerInitialization (player) {
-    const {socket} = this
+    const { socket } = this
 
     if (!this.inGame) {
-      const {x, y, hp, teamId} = player
+      const { x, y, hp, teamId } = player
       console.log(player)
 
       this.player = new Player({
@@ -143,9 +157,9 @@ export default class extends Phaser.State {
     this.initializeOtherPlayer(ally, 'ally')
   }
 
-  initializeOtherPlayer(otherPlayer, asset) {
-    const {socket, enemies} = this
-    const {x, y, id, hp, teamId} = otherPlayer
+  initializeOtherPlayer (otherPlayer, asset) {
+    const { socket, enemies } = this
+    const { x, y, id, hp, teamId } = otherPlayer
     console.log('New enemy: ', otherPlayer)
 
     const enemySprite = new Enemy({
@@ -164,28 +178,28 @@ export default class extends Phaser.State {
   }
 
   handlePlayerRemove (enemyToRemoveId) {
-    const {enemies} = this
+    const { enemies } = this
     const enemyToRemove = enemies[enemyToRemoveId]
     delete enemies[enemyToRemoveId]
     enemyToRemove.destroy()
   }
 
-  handlePlayerBulletInitialization ({id, x, y, playerId}) {
-    const {playerBullets, playerBulletGroup} = this
-    const bullet = new Bullet({game: this.game, x, y, id, playerId, group: playerBulletGroup, color: 0x00FFFF})
+  handlePlayerBulletInitialization ({ id, x, y, playerId }) {
+    const { playerBullets, playerBulletGroup } = this
+    const bullet = new Bullet({ game: this.game, x, y, id, playerId, group: playerBulletGroup, color: 0x00FFFF })
     playerBullets[id] = bullet
     playerBulletGroup.add(bullet)
   }
 
-  handleEnemyBulletInitialization ({id, x, y, playerId}) {
-    const {enemyBullets, enemyBulletGroup} = this
-    const bullet = new Bullet({game: this.game, x, y, id, playerId, group: enemyBulletGroup, color: 0xFF0000})
+  handleEnemyBulletInitialization ({ id, x, y, playerId }) {
+    const { enemyBullets, enemyBulletGroup } = this
+    const bullet = new Bullet({ game: this.game, x, y, id, playerId, group: enemyBulletGroup, color: 0xFF0000 })
     enemyBullets[id] = bullet
     enemyBulletGroup.add(bullet)
   }
 
-  handlePlayerBulletMove ({id, x, y}) {
-    const {playerBullets} = this
+  handlePlayerBulletMove ({ id, x, y }) {
+    const { playerBullets } = this
 
     const bullet = playerBullets[id]
 
@@ -193,8 +207,8 @@ export default class extends Phaser.State {
     bullet.y = y
   }
 
-  handleEnemyBulletMove ({id, x, y}) {
-    const {enemyBullets} = this
+  handleEnemyBulletMove ({ id, x, y }) {
+    const { enemyBullets } = this
 
     const bullet = enemyBullets[id]
     if (bullet) {
@@ -204,7 +218,7 @@ export default class extends Phaser.State {
   }
 
   handlePlayerBulletRemove (bulletId) {
-    const {playerBullets, playerBulletGroup} = this
+    const { playerBullets, playerBulletGroup } = this
     const bullet = playerBullets[bulletId]
 
     playerBulletGroup.remove(bullet)
@@ -212,7 +226,7 @@ export default class extends Phaser.State {
   }
 
   handleEnemyBulletRemove (bulletId) {
-    const {enemyBullets, enemyBulletGroup} = this
+    const { enemyBullets, enemyBulletGroup } = this
     const bullet = enemyBullets[bulletId]
 
     enemyBulletGroup.remove(bullet)
@@ -226,6 +240,8 @@ export default class extends Phaser.State {
 
     if (this.player) {
       this.game.debug.text(`k: ${this.player.score.kills} d: ${this.player.score.deaths}`, 20, 20)
+      this.game.debug.text(this.gameStateMessage, 220, 20)
+      this.game.debug.text(this.teamScoresMessage, 420, 20)
     }
   }
 }
